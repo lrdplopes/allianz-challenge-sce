@@ -1,7 +1,3 @@
-"""
-Common utilities for VPC API Lambda functions
-"""
-
 from .vpc_manager import VPCManager
 from .dynamodb import VPCMetadataStore
 from .responses import (

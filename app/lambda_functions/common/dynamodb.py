@@ -16,6 +16,7 @@ class VPCMetadataStore:
         logger.info(f"Initialized DynamoDB store with table: {self.table_name}")
 
     def save_vpc(self, vpc_data: Dict) -> Dict:
+        """Save VPC metadata to DynamoDB"""
         try:
             if 'vpc_id' not in vpc_data:
                 raise ValueError("vpc_id is required")
@@ -33,6 +34,7 @@ class VPCMetadataStore:
             raise
 
     def get_vpc(self, vpc_id: str) -> Optional[Dict]:
+        """Retrieve VPC metadata by ID"""
         try:
             logger.info(f"Retrieving VPC metadata: {vpc_id}")
             response = self.table.get_item(Key={'vpc_id': vpc_id})
@@ -49,6 +51,7 @@ class VPCMetadataStore:
             raise
 
     def list_vpcs(self, limit: int = 100) -> List[Dict]:
+        """List all VPCs in metadata store"""
         try:
             logger.info("Listing all VPCs from metadata store")
             response = self.table.scan(Limit=limit)
@@ -62,6 +65,7 @@ class VPCMetadataStore:
             raise
 
     def delete_vpc(self, vpc_id: str) -> bool:
+        """Delete VPC metadata from store"""
         try:
             logger.info(f"Deleting VPC metadata: {vpc_id}")
 

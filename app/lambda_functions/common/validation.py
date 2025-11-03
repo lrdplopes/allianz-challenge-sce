@@ -5,12 +5,16 @@ from typing import Dict, Optional, Tuple
 def validate_vpc_name(name: str) -> Tuple[bool, Optional[str]]:
     if not name:
         return False, "VPC name is required"
+
     if len(name) > 255:
         return False, "VPC name must be 255 characters or less"
+
     if len(name) < 1:
         return False, "VPC name must be at least 1 character"
+
     if not name[0].isalnum():
         return False, "VPC name must start with an alphanumeric character"
+
     if not re.match(r'^[a-zA-Z0-9][a-zA-Z0-9_-]*$', name):
         return False, "VPC name can only contain alphanumeric characters, hyphens, and underscores"
 
@@ -21,7 +25,6 @@ def validate_cidr_block(cidr: str) -> Tuple[bool, Optional[str]]:
     if not cidr:
         return False, "CIDR block is required"
 
-    # Check format
     if '/' not in cidr:
         return False, "CIDR block must include a prefix (e.g., 10.0.0.0/16)"
 

@@ -1,3 +1,5 @@
+"""VPC Manager - Core logic for creating and managing VPCs using boto3"""
+
 import logging
 from datetime import datetime
 from typing import Dict, List, Optional
@@ -9,7 +11,7 @@ logger.setLevel(logging.INFO)
 
 
 class VPCManager:
-    def __init__(self, region: str = 'us-east-1'):
+    def __init__(self, region: str = 'us-east-2'):
         self.ec2_client = boto3.client('ec2', region_name=region)
         self.ec2_resource = boto3.resource('ec2', region_name=region)
         self.region = region

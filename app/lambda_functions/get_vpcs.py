@@ -34,7 +34,7 @@ def handler(event, context):
                 from common import validation_error_response
                 return validation_error_response(error_message)
 
-            # Retrieve from DynamoDB
+            
             vpc_data = metadata_store.get_vpc(vpc_id)
 
             if not vpc_data:
@@ -45,12 +45,13 @@ def handler(event, context):
             return success_response(data=vpc_data)
 
         else:
-            # List all VPCs
+            
             logger.info("Listing all VPCs")
 
             query_params = event.get('queryStringParameters') or {}
             limit = int(query_params.get('limit', 100))
 
+            
             vpcs = metadata_store.list_vpcs(limit=limit)
 
             logger.info(f"Retrieved {len(vpcs)} VPCs")

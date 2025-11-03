@@ -16,7 +16,7 @@ from common import (
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-AWS_REGION = os.environ.get('AWS_REGION', 'us-east-1')
+AWS_REGION = os.environ.get('AWS_REGION', 'us-east-2')
 
 
 def handler(event, context):
@@ -24,12 +24,16 @@ def handler(event, context):
     logger.info("Received CreateVPC request")
     logger.info(f"Event: {json.dumps(event)}")
 
-    request_id = context.request_id if context else str(uuid.uuid4())
+    
+    request_id = context.aws_request_id if context else str(uuid.uuid4())
 
     try:
+        
         body = json.loads(event.get('body', '{}')) if isinstance(event.get('body'), str) else event.get('body', {})
+
         logger.info(f"Request body: {json.dumps(body)}")
 
+        
         is_valid, error_message, validated_data = validate_create_vpc_request(body)
         if not is_valid:
             logger.warning(f"Validation failed: {error_message}")
@@ -40,10 +44,11 @@ def handler(event, context):
 
         logger.info(f"Creating VPC: name={name}, cidr={cidr_block}, request_id={request_id}")
 
+        
         vpc_manager = VPCManager(region=AWS_REGION)
         metadata_store = VPCMetadataStore()
 
-        # Create VPC
+        
         vpc_details = vpc_manager.create_vpc(
             name=name,
             cidr_block=cidr_block,
@@ -52,11 +57,12 @@ def handler(event, context):
 
         logger.info(f"VPC created successfully: {vpc_details['vpc_id']}")
 
-        # Store metadata in DynamoDB
+        
         metadata_store.save_vpc(vpc_details)
 
         logger.info(f"VPC metadata saved to DynamoDB: {vpc_details['vpc_id']}")
 
+        
         return success_response(
             data=vpc_details,
             status_code=201,
@@ -73,6 +79,7 @@ def handler(event, context):
 
         logger.error(f"AWS API error: {error_code} - {error_message}")
 
+        
         if error_code == 'VpcLimitExceeded':
             return validation_error_response(
                 "VPC limit exceeded. Please delete unused VPCs or request a limit increase.",
@@ -87,9 +94,11 @@ def handler(event, context):
             return internal_error_response(e)
 
     except ValueError as e:
+        
         logger.error(f"Validation error: {str(e)}")
         return validation_error_response(str(e))
 
     except Exception as e:
+        
         logger.exception("Unexpected error creating VPC")
         return internal_error_response(e)

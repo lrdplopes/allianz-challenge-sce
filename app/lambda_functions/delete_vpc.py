@@ -16,7 +16,7 @@ from common import (
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-AWS_REGION = os.environ.get('AWS_REGION', 'us-east-1')
+AWS_REGION = os.environ.get('AWS_REGION', 'us-east-2')
 
 
 def handler(event, context):
@@ -25,6 +25,7 @@ def handler(event, context):
     logger.info(f"Event: {json.dumps(event)}")
 
     try:
+        
         path_parameters = event.get('pathParameters') or {}
         vpc_id = path_parameters.get('vpc_id')
 
@@ -34,27 +35,32 @@ def handler(event, context):
 
         logger.info(f"Deleting VPC: {vpc_id}")
 
+        
         is_valid, error_message = validate_vpc_id(vpc_id)
         if not is_valid:
             logger.warning(f"Invalid VPC ID format: {vpc_id}")
             return validation_error_response(error_message)
 
+        
         vpc_manager = VPCManager(region=AWS_REGION)
         metadata_store = VPCMetadataStore()
 
-        # Check if VPC exists in metadata store
+        
         vpc_data = metadata_store.get_vpc(vpc_id)
         if not vpc_data:
             logger.info(f"VPC not found in metadata store: {vpc_id}")
             return not_found_response('VPC', vpc_id)
 
+        
         metadata_store.update_vpc_status(vpc_id, 'deleting')
         logger.info(f"Updated VPC status to 'deleting': {vpc_id}")
 
+        
         try:
             deletion_result = vpc_manager.delete_vpc(vpc_id)
             logger.info(f"VPC deleted from AWS: {vpc_id}")
         except ClientError as e:
+            
             if e.response['Error']['Code'] == 'InvalidVpcID.NotFound':
                 logger.warning(f"VPC not found in AWS (already deleted): {vpc_id}")
                 deletion_result = {
@@ -65,9 +71,11 @@ def handler(event, context):
             else:
                 raise
 
+        
         metadata_store.delete_vpc(vpc_id)
         logger.info(f"VPC metadata deleted from DynamoDB: {vpc_id}")
 
+        
         return success_response(
             data=deletion_result,
             status_code=200,
@@ -80,6 +88,7 @@ def handler(event, context):
 
         logger.error(f"AWS API error: {error_code} - {error_message}")
 
+        
         if error_code == 'DependencyViolation':
             return validation_error_response(
                 "Cannot delete VPC due to existing dependencies. "
@@ -90,5 +99,6 @@ def handler(event, context):
             return internal_error_response(e)
 
     except Exception as e:
+        
         logger.exception("Unexpected error deleting VPC")
         return internal_error_response(e)
