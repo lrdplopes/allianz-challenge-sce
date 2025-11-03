@@ -527,10 +527,10 @@ aws cloudformation describe-stacks --stack-name VPCAPIStack --region us-east-2
 
 ### 10. Test Summary
 
-| Test | Endpoint | Status | Duration |
-|------|----------|--------|----------|
-| Create VPC | `POST /vpc` | ✅ Success | ~5s |
-| List VPCs | `GET /vpc` | ✅ Success | ~200ms |
-| Get VPC by ID | `GET /vpc/{id}` | ✅ Success | ~150ms |
-| Delete VPC | `DELETE /vpc/{id}` | ✅ Success | ~3s |
-| Verify Deletion | `GET /vpc` | ✅ Success | ~180ms |
+| Test | Endpoint |
+|------|--------- |
+| Create VPC | `POST /vpc` |
+| List VPCs | `GET /vpc` |
+| Get VPC by ID | `GET /vpc/{id}` |
+| Delete VPC | `DELETE /vpc/{id}` |
+| Verify Deletion | `GET /vpc` |
