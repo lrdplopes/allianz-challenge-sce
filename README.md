@@ -525,7 +525,7 @@ aws cloudformation describe-stacks --stack-name VPCAPIStack --region us-east-2
 
 ---
 
-### 10. Test Summary
+### 9. Test Summary
 
 | Test | Endpoint |
 |------|--------- |
